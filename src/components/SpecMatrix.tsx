@@ -80,7 +80,7 @@ export function SpecMatrix() {
       <section className="apple-tile bg-canvas border-b border-gray-100 px-4">
         <div className="max-w-[980px] w-full">
           <h2 className="text-[40px] md:text-[56px] font-semibold tracking-tight leading-[1.07] mb-4">
-            Compare components.<br />Find the perfect fit.
+            Compare components.
           </h2>
           <p className="text-[21px] md:text-[28px] text-ink/60 mb-10 max-w-2xl mx-auto">
             Input multiple part numbers to contrast key specifications side-by-side in real-time.
