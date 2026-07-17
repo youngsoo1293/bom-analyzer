@@ -11,7 +11,6 @@ export function BOMAnalyzer() {
 
   const simulateComparison = () => {
     setIsComparing(true);
-    // Simulate API delay
     setTimeout(async () => {
       const mockResults: BOMDiff[] = [
         { status: 'changed', refDes: 'Q101', oldPart: 'IRF540N', newPart: 'IRF540NPBF', description: 'Upgraded to Pb-free' },
@@ -22,7 +21,6 @@ export function BOMAnalyzer() {
       setResults(mockResults);
       setIsComparing(false);
 
-      // Automatically save to history
       try {
         await fetch('/api/history', {
           method: 'POST',
@@ -42,148 +40,133 @@ export function BOMAnalyzer() {
   const getStatusInfo = (status: string) => {
     switch (status) {
       case 'added': return { 
-        icon: <PlusCircle className="w-4 h-4 text-emerald-500" />, 
-        label: 'ADDED (추가)', 
-        color: 'text-emerald-700 bg-emerald-50 border-emerald-100' 
+        icon: <PlusCircle className="w-4 h-4" />, 
+        label: 'ADDED', 
+        color: 'text-emerald-600 bg-emerald-50' 
       };
       case 'deleted': return { 
-        icon: <MinusCircle className="w-4 h-4 text-rose-500" />, 
-        label: 'DELETED (삭제)', 
-        color: 'text-rose-700 bg-rose-50 border-rose-100' 
+        icon: <MinusCircle className="w-4 h-4" />, 
+        label: 'DELETED', 
+        color: 'text-rose-600 bg-rose-50' 
       };
       case 'changed': return { 
-        icon: <RefreshCcw className="w-4 h-4 text-blue-500" />, 
-        label: 'CHANGED (수정)', 
-        color: 'text-blue-700 bg-blue-50 border-blue-100' 
+        icon: <RefreshCcw className="w-4 h-4" />, 
+        label: 'CHANGED', 
+        color: 'text-primary bg-primary/5' 
       };
       default: return { icon: null, label: '', color: '' };
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Old BOM Upload */}
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-            <Upload className="w-8 h-8 text-slate-400" />
+    <div className="w-full">
+      {/* Hero Tile */}
+      <section className="apple-tile bg-canvas px-4">
+        <div className="max-w-[980px] w-full">
+          <h2 className="text-[40px] md:text-[56px] font-semibold tracking-tight leading-[1.07] mb-4">
+            BOM Evolution.<br />Simplified.
+          </h2>
+          <p className="text-[21px] md:text-[28px] text-ink/60 mb-12 max-w-2xl mx-auto">
+            Upload two versions of your bill of materials to automatically detect additions, deletions, and part updates.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto w-full">
+            <div className="flex flex-col items-center">
+              <input type="file" id="old-bom" className="hidden" onChange={(e) => setOldFile(e.target.files?.[0]?.name || null)} />
+              <label htmlFor="old-bom" className="apple-button-secondary w-full text-center cursor-pointer flex items-center justify-center gap-2">
+                <Upload className="w-4 h-4" />
+                {oldFile || 'Baseline BOM'}
+              </label>
+              <p className="text-[12px] text-ink/40 mt-2 font-medium">Select original version</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <input type="file" id="new-bom" className="hidden" onChange={(e) => setNewFile(e.target.files?.[0]?.name || null)} />
+              <label htmlFor="new-bom" className="apple-button-secondary w-full text-center cursor-pointer flex items-center justify-center gap-2">
+                <Upload className="w-4 h-4" />
+                {newFile || 'Updated BOM'}
+              </label>
+              <p className="text-[12px] text-ink/40 mt-2 font-medium">Select current version</p>
+            </div>
           </div>
-          <h3 className="text-sm font-semibold text-slate-900 mb-1">Old Version (Base)</h3>
-          <p className="text-xs text-slate-500 mb-4">Upload baseline Excel/CSV</p>
-          <input 
-            type="file" 
-            id="old-bom" 
-            className="hidden" 
-            onChange={(e) => setOldFile(e.target.files?.[0]?.name || null)} 
-          />
-          <label 
-            htmlFor="old-bom"
-            className="inline-block px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors"
+
+          <button
+            onClick={simulateComparison}
+            disabled={!oldFile || !newFile || isComparing}
+            className="apple-button-primary mt-12 px-10 py-4 shadow-2xl shadow-primary/20"
           >
-            {oldFile || 'Select File'}
-          </label>
+            {isComparing ? 'Analyzing Changes...' : 'Compare BOMs'}
+          </button>
         </div>
+      </section>
 
-        {/* New BOM Upload */}
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-            <Upload className="w-8 h-8 text-slate-400" />
-          </div>
-          <h3 className="text-sm font-semibold text-slate-900 mb-1">New Version (Current)</h3>
-          <p className="text-xs text-slate-500 mb-4">Upload updated Excel/CSV</p>
-          <input 
-            type="file" 
-            id="new-bom" 
-            className="hidden" 
-            onChange={(e) => setNewFile(e.target.files?.[0]?.name || null)} 
-          />
-          <label 
-            htmlFor="new-bom"
-            className="inline-block px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors"
-          >
-            {newFile || 'Select File'}
-          </label>
-        </div>
-      </div>
-
-      <div className="flex justify-center">
-        <button
-          onClick={simulateComparison}
-          disabled={!oldFile || !newFile || isComparing}
-          className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 shadow-lg shadow-slate-200 active:scale-95"
-        >
-          {isComparing ? (
-            <>
-              <RefreshCcw className="w-5 h-5 animate-spin" />
-              Analyzing Changes...
-            </>
-          ) : (
-            <>
-              Compare BOMs
-              <ArrowRight className="w-5 h-5" />
-            </>
-          )}
-        </button>
-      </div>
-
+      {/* Results Tile */}
       <AnimatePresence>
         {results && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden"
+          <motion.section 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-canvas-parchment py-16 px-4"
           >
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">Change Log</h2>
-                <p className="text-sm text-slate-500">Detected {results.length} structural modifications</p>
+            <div className="max-w-[980px] mx-auto">
+              <div className="flex justify-between items-end mb-8">
+                <div>
+                  <span className="text-[14px] font-semibold text-primary uppercase tracking-widest block mb-2">Analysis Results</span>
+                  <h3 className="text-[34px] font-semibold tracking-tight">Modification Log</h3>
+                </div>
+                <button className="text-primary text-[14px] font-medium hover:underline flex items-center gap-1 mb-1">
+                  Export Report <ArrowRight className="w-3 h-3" />
+                </button>
               </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
-                <Save className="w-4 h-4" />
-                Export Report
-              </button>
-            </div>
-            
-            <div className="divide-y divide-slate-50">
-              {results.map((diff, idx) => {
-                const info = getStatusInfo(diff.status);
-                return (
-                  <div key={`${diff.refDes}-${idx}`} className="p-4 flex items-start gap-4 transition-colors hover:bg-slate-50">
-                    <div className={`mt-1 p-2 rounded-lg border flex items-center gap-2 min-w-[120px] ${info.color}`}>
-                      {info.icon}
-                      <span className="text-[10px] font-bold uppercase tracking-wider">{info.label}</span>
-                    </div>
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 pl-2">
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Component ID (부품 위치)</span>
-                        <span className="text-sm font-bold text-slate-900">{diff.refDes}</span>
+
+              <div className="space-y-4">
+                {results.map((diff, idx) => {
+                  const info = getStatusInfo(diff.status);
+                  return (
+                    <motion.div 
+                      key={`${diff.refDes}-${idx}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="bg-white rounded-[18px] p-6 border border-gray-200/50 flex flex-col md:flex-row md:items-center gap-6"
+                    >
+                      <div className={`flex items-center gap-2 px-3 py-1 rounded-full w-fit ${info.color}`}>
+                        {info.icon}
+                        <span className="text-[10px] font-bold tracking-wider">{info.label}</span>
                       </div>
-                      <div className="md:col-span-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Modification Details</span>
-                        <div className="flex items-center gap-3">
-                          {diff.status === 'changed' ? (
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="text-slate-400 line-through">{diff.oldPart}</span>
-                              <ArrowRight className="w-3 h-3 text-slate-400" />
-                              <span className="text-blue-600 font-bold">{diff.newPart}</span>
-                            </div>
-                          ) : (
-                            <span className="text-sm font-medium text-slate-900">{diff.partNumber}</span>
-                          )}
+                      
+                      <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6">
+                        <div>
+                          <p className="text-[12px] text-ink/40 font-semibold uppercase tracking-widest mb-1">Component ID</p>
+                          <p className="text-[17px] font-semibold text-ink">{diff.refDes}</p>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">{diff.description}</p>
+                        <div className="col-span-2">
+                          <p className="text-[12px] text-ink/40 font-semibold uppercase tracking-widest mb-1">Update Details</p>
+                          <div className="flex items-center gap-3">
+                            {diff.status === 'changed' ? (
+                              <div className="flex items-center gap-2 text-[17px]">
+                                <span className="text-ink/30 line-through">{diff.oldPart}</span>
+                                <ArrowRight className="w-3 h-3 text-ink/20" />
+                                <span className="text-primary font-semibold">{diff.newPart}</span>
+                              </div>
+                            ) : (
+                              <span className="text-[17px] font-medium text-ink">{diff.partNumber}</span>
+                            )}
+                          </div>
+                          <p className="text-[12px] text-ink/50 mt-1">{diff.description}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 text-slate-300 hover:text-slate-900 transition-colors">
-                        <CheckCircle2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                      
+                      <div className="flex justify-end md:block">
+                        <button className="text-primary/20 hover:text-primary transition-colors">
+                           <CheckCircle2 className="w-6 h-6" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
-          </motion.div>
+          </motion.section>
         )}
       </AnimatePresence>
     </div>

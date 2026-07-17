@@ -1,7 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Apple Color System */
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-primary-on-dark: #2997ff;
+  
+  --color-canvas: #ffffff;
+  --color-canvas-parchment: #f5f5f7;
+  --color-surface-pearl: #fafafc;
+  
+  --color-tile-1: #272729;
+  --color-tile-2: #2a2a2c;
+  
+  --color-ink: #1d1d1f;
+  --color-ink-muted: #7a7a7a;
+  
+  --spacing-section: 80px;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink antialiased selection:bg-primary/20;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-semibold tracking-tight text-ink;
+    letter-spacing: -0.03em;
+  }
+}
+
+@layer components {
+  .apple-button-primary {
+    @apply bg-primary text-white font-normal rounded-full px-5 py-2.5 transition-all duration-200 active:scale-95 disabled:opacity-40;
+    font-size: 17px;
+  }
+
+  .apple-button-secondary {
+    @apply border border-primary text-primary font-normal rounded-full px-5 py-2.5 transition-all duration-200 active:scale-95 disabled:opacity-40;
+    font-size: 17px;
+  }
+
+  .apple-tile {
+    @apply py-section w-full flex flex-col items-center text-center;
+  }
 }
